@@ -10,7 +10,7 @@ The idea behind this app was to create a tool that would facilitate a more inter
 
 ## Getting Started
 
-- **Deployed App:** [https://omni-ai-app-fc082d83eddb.herokuapp.com/login](#)
+- **Deployed App:** [https://omni-ai-app-fc082d83eddb.herokuapp.com/](#)
 - **Planning Materials:** [https://trello.com/b/u1LgmzUw/unit-2-project](#)
 - **ERD (Entity Relationship Diagram):** [https://www.figma.com/board/fz3IJeRhmb1F15ARa9XcoJ/ERD-%3E-Omni---AI?node-id=36-330&node-type=frame&t=fjAfmchKwpqTMhlT-0](#)
 
