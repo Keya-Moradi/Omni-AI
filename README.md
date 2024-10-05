@@ -1,6 +1,6 @@
 # Omni-AI: AI Integration Platform
 
-![Omni-AI Logo](#) <!-- Replace with the actual path to the logo or screenshot -->
+![Omni-AI Login Screen](.vscode/images/Omni-AI.jpeg)
 
 ## Description
 
@@ -10,8 +10,8 @@ The idea behind this app was to create a tool that would facilitate a more inter
 
 ## Getting Started
 
-- **Deployed App:** [Link to the deployed app](#) <!-- Replace with the actual deployment link -->
-- **Planning Materials:** [Link to planning documents](#) <!-- Replace with a link to any planning documents or materials -->
+- **Deployed App:** [https://omni-ai-app-fc082d83eddb.herokuapp.com/login](#)
+- **Planning Materials:** [https://trello.com/b/u1LgmzUw/unit-2-project](#)
 
 ## Features
 
@@ -22,7 +22,7 @@ The idea behind this app was to create a tool that would facilitate a more inter
 
 ## Screenshot
 
-![Omni-AI Screenshot](#) <!-- Replace with the actual screenshot of the app -->
+![User Experience](.vscode/images/UX.jpeg)
 
 ## Attributions
 
@@ -74,9 +74,3 @@ const auth = new GoogleAuth({
 
 // Helper function to send a request to the ChatGPT API
 ```
-
-## In Progress
-
-- Link to the deployed app.
-- Planning material links.
-- Logo and screenshot integration.
