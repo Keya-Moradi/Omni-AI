@@ -1,11 +1,12 @@
 const axios = require('axios');
+// const { GoogleAuth } = require('google-auth-library');
 const queries = require('../queries');
 const Message = require('../models/Message');
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GOOGLE_PROJECT_ID = process.env.GOOGLE_PROJECT_ID; // Your Google Cloud Project ID
+const GOOGLE_SERVICE_ACCOUNT_PATH = process.env.GOOGLE_SERVICE_ACCOUNT_PATH; // Path to your service account JSON file
 
-// Helper function to send a request to the ChatGPT API
 const getChatGPTResponse = async (conversationHistory) => {
     try {
         const response = await axios.post('https://api.openai.com/v1/completions', {
@@ -27,12 +28,19 @@ const getChatGPTResponse = async (conversationHistory) => {
 // Helper function to send a request to the Gemini API (replace with actual endpoint)
 const getGeminiResponse = async (conversationHistory) => {
     try {
-        const response = await axios.post('https://api.gemini.com/v1/conversations', {
+        // Obtain Google Auth client
+        const client = await auth.getClient();
+        
+        // Get access token from the client
+        const token = await client.getAccessToken();
+
+        const response = await axios.post('https://gemini-api-endpoint-url', { // Replace with the actual Gemini endpoint
             prompt: conversationHistory,
             max_tokens: 150
         }, {
             headers: {
-                'Authorization': `Bearer ${GEMINI_API_KEY}`
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
             }
         });
         return response.data.response.trim(); // Adjust based on actual API response structure
