@@ -1,0 +1,145 @@
+styles.css
+body {
+    font-family: Arial, sans-serif;
+    background-color: #e6f7ff; /* Very light blue background */
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+h1, h2 {
+    color: #1a3b5d; /* Darker shade for better contrast */
+}
+
+input, button, textarea {
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid #666; /* Darker border for contrast */
+    border-radius: 4px;
+    width: 100%;
+    max-width: 300px;
+    box-sizing: border-box;
+}
+
+textarea {
+    resize: none; /* Prevents resizing of the textarea */
+    height: 80px; /* Set a fixed height for the profile info box */
+}
+
+button {
+    background-color: #005a9e; /* Darker blue for contrast */
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #00407a; /* Even darker on hover for contrast */
+}
+
+form {
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+p {
+    color: #e74c3c;
+}
+
+a {
+    text-decoration: none;
+    color: #005a9e;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-image {
+    width: 200px;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Dashboard specific styling */
+ul {
+    list-style-type: none; /* Removes bullets */
+    padding: 0;
+    width: 100%;
+    max-width: 600px;
+    margin: 20px 0;
+}
+
+li {
+    background: #ffffff;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+li > div {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-start;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .login-container {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+
+    .login-image {
+        margin-right: 20px;
+        margin-bottom: 0;
+    }
+
+    .login-form {
+        align-items: flex-start;
+    }
+
+    form {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    li {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+.login-image {
+    max-width: 150px; /* Restrict the maximum width */
+    max-height: 150px; /* Restrict the maximum height */
+    width: 100%; /* Ensure the image scales within the max constraints */
+    height: auto; /* Maintain aspect ratio */
+    margin-bottom: 20px;
+    display: block; /* Center the image */
+}
+
