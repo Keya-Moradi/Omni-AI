@@ -10,7 +10,7 @@ exports.viewConversations = async (req, res) => {
             return res.redirect('/login');
         }
 
-        //find user conversations iin reverse-chronological order
+        //find user conversations in reverse-chronological order
         const user = await User.findById(userId).populate('conversations').exec();
         const conversations = user.conversations.sort((a, b) => b._id.getTimestamp() -a._id.getTimestamp());
 
@@ -57,7 +57,7 @@ exports.deleteConversation = async (req, res) => {
         const { conversationId } = req.params;
 
         if (!userId) {
-            return res.redirect('/login');
+            return res.status(401).send('Unauthorized');
         }
 
         // Find and delete the conversation
@@ -66,10 +66,10 @@ exports.deleteConversation = async (req, res) => {
         // Remove conversation from user's conversations
         await User.findByIdAndUpdate(userId, { $pull: { conversations: conversationId}});
 
-        res.redirect('/dashboard');
+        res.status(200).send('Conversation deleted successfully baby!');
     } catch (error) {
         console.error('Error deleting conversation:', error);
-        res.redirect('/dashboard');
+        res.status(500).send('Error deleting conversation');
     }
         };
 
@@ -80,15 +80,15 @@ exports.editConversation = async (req, res) => {
         const { conversationId, newTitle } = req.body;
 
         if (!userId) {
-            return res.redirect('/login');
+            return res.status(401).send('Unauthorized');
         }
 
         // Update the conversation title
         await Conversation.findByIdAndUpdate(conversationId, { title: newTitle});
 
-        res.redirect('/dashboard');
-        } catch (error) {
-            console.error('Error editing conversation:', error);
-            res.redirect('/dashboard');
-        }
+        res.status(200).send('Conversation updated successfully baby!');
+    } catch (error) {
+        console.error('Error editing conversation:', error);
+        res.status(500).send('Error editing conversation');
+    }
     };

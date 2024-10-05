@@ -31,12 +31,12 @@ mongoose.connect(process.env.MONGODB_URI, {
     console.error('MongoDB connection error:', error);
 });
 
-// Routes
+// Home Route
 app.get('/', (req, res)=>{
     res.send('Server is running baby!');
 });
 
-// Imported Controllers
+// Imported Authorization Controllers
 const authController = require('./controllers/authController');
 
 // Routes for authentication
@@ -45,6 +45,15 @@ app.post('/signup', authController.signup);
 app.get('/login', authController.loginPage);
 app.post('/login', authController.login);
 app.get('/logout', authController.logout);
+
+// Imported Conversation Controllers
+const conversationController = require('./controllers/conversationController');
+
+// Routes for conversations
+app.get('/dashboard', conversationController.viewConversations);
+app.post('/conversation/start', conversationController.startConversation);
+app.put('/conversation/edit', conversationController.editConversation);
+app.delete('/conversation/delete/:conversationId', conversationController.deleteConversation);
 
 // Start the server
 app.listen(PORT, ()=>{
