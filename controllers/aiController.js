@@ -64,6 +64,10 @@ exports.startAIConversation = async (req, res) => {
             return res.status(401).send('Unauthorized');
         }
 
+         // Debugging API keys
+         console.log('OpenAI API Key:', OPENAI_API_KEY);
+         console.log('Google API Key:', process.env.GOOGLE_API_KEY);
+
         console.log('Received prompt:', prompt); // Debugging
         console.log('Conversation ID:', conversationId); // Debugging
 
