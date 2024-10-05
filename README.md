@@ -10,8 +10,9 @@ The idea behind this app was to create a tool that would facilitate a more inter
 
 ## Getting Started
 
-- **Deployed App:** [https://omni-ai-app-fc082d83eddb.herokuapp.com/login](#)
-- **Planning Materials:** [https://trello.com/b/u1LgmzUw/unit-2-project](#)
+- **Deployed App:** [https://tinyurl.com/Heroku-Link](#)
+- **Planning Materials:** [https://tinyurl.com/Planning-Link](#)
+- **ERD (Entity Relationship Diagram):** [https://tinyurl.com/ERD-Link](#)
 
 ## Features
 
