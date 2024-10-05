@@ -37,6 +37,14 @@ app.get('/', (req, res)=>{
 });
 
 // Imported Controllers
+const authController = require('./controllers/authController');
+
+// Routes for authentication
+app.get('/signup', authController.signupPage);
+app.post('/signup', authController.signup);
+app.get('/login', authController.loginPage);
+app.post('/login', authController.login);
+app.get('/logout', authController.logout);
 
 // Start the server
 app.listen(PORT, ()=>{
