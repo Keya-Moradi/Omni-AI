@@ -19,7 +19,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static('public'));
 app.use(methodOverride('_method'));
-app.use(express.static('public'));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -31,9 +30,6 @@ app.use(session({
 }));
 
 // Connect to MongoDB
-require('dotenv').config(); // This loads environment variables from your .env file
-const mongoose = require('mongoose');
-
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         console.log('Connected to MongoDB baby!');
