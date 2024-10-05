@@ -2,16 +2,11 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
-const MongoStore = require('connect-mongo'); // Import connect-mongo
+const MongoStore = require('connect-mongo');
 const path = require('path');
 const methodOverride = require('method-override');
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-// Imported Controllers
-const authController = require('./controllers/authController');
-const conversationController = require('./controllers/conversationController');
-const aiController = require('./controllers/aiController');
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
@@ -30,7 +25,7 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
         console.error('MongoDB connection error:', error);
     });
 
-// Session Management using MongoDB store
+// Session Management
 app.use(session({
     secret: 'your-secret-key',
     resave: false,
@@ -41,6 +36,11 @@ app.use(session({
     }),
 }));
 
+// Routes
+app.use('/', require('./routes/authRoutes'));
+app.use('/', require('./routes/conversationRoutes'));
+app.use('/', require('./routes/aiRoutes'));
+
 // Home Route
 app.get('/', (req, res) => {
     if (req.session.userId) {
@@ -49,22 +49,6 @@ app.get('/', (req, res) => {
         res.redirect('/login');
     }
 });
-
-// Routes for authentication
-app.get('/signup', authController.signupPage);
-app.post('/signup', authController.signup);
-app.get('/login', authController.loginPage);
-app.post('/login', authController.login);
-app.get('/logout', authController.logout);
-
-// Routes for conversations
-app.get('/dashboard', conversationController.viewConversations);
-app.post('/conversation/start', conversationController.startConversation);
-app.put('/conversation/edit', conversationController.editConversation);
-app.delete('/conversation/delete/:conversationId', conversationController.deleteConversation);
-
-// Routes to start AI conversation
-app.post('/conversation/ai', aiController.startAIConversation);
 
 // Start the server
 app.listen(PORT, () => {
