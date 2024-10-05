@@ -1,5 +1,4 @@
 const queries = require('../queries');
-const Conversation = require('../models/Conversation');
 const User = require('../models/User');
 
 // Render the dashboard with the user's conversations
@@ -31,14 +30,8 @@ exports.startConversation = async (req, res) => {
 
         const { title } = req.body;
 
-        // Create a new conversation
-        const newConversation = new Conversation({
-            user: userId,
-            title,
-            messages: []
-        });
-
-        await newConversation.save();
+        // Create a new conversation using queries.js
+        const newConversation = await queries.createConversation(userId, title);
 
         // Add conversation to user's conversations
         await User.findByIdAndUpdate(userId, { $push: { conversations: newConversation._id } });
@@ -60,8 +53,8 @@ exports.deleteConversation = async (req, res) => {
             return res.status(401).send('Unauthorized');
         }
 
-        // Find and delete the conversation
-        await Conversation.findByIdAndDelete(conversationId);
+        // Delete the conversation using queries.js
+        await queries.deleteConversationById(conversationId);
 
         // Remove conversation reference from user's conversations
         await User.findByIdAndUpdate(userId, { $pull: { conversations: conversationId } });
@@ -83,8 +76,8 @@ exports.editConversation = async (req, res) => {
             return res.status(401).send('Unauthorized');
         }
 
-        // Update the conversation title
-        await Conversation.findByIdAndUpdate(conversationId, { title: newTitle });
+        // Update the conversation title using queries.js
+        await queries.updateConversationTitle(conversationId, newTitle);
 
         res.status(200).send('Conversation updated successfully.');
     } catch (error) {
