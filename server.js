@@ -30,14 +30,13 @@ app.use(session({
 }));
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-}).then(()=>{
-    console.log('Connected to MongoDB baby!');
-}).catch((error)=>{
-    console.error('MongoDB connection error:', error);
-});
+mongoose.connect(process.env.MONGODB_URI)
+    .then(() => {
+        console.log('Connected to MongoDB baby!');
+    })
+    .catch((error) => {
+        console.error('MongoDB connection error:', error);
+    });
 
 // Home Route
 app.get('/', (req, res)=>{
