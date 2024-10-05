@@ -4,44 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        input, button { margin: 10px; padding: 10px; }
+    </style>
 </head>
 <body>
     <h1>Your Conversations</h1>
-
-    <!-- List of Conversations-->
     <ul>
         <% conversations.forEach(function(conversation) { %>
             <li>
                 <strong><%= conversation.title %></strong>
-                
-                <!-- Edit Form -->
                 <form action="/conversation/edit?_method=PUT" method="POST" style="display: inline;">
                     <input type="hidden" name="conversationId" value="<%= conversation._id %>">
                     <input type="text" name="newTitle" placeholder="New Title" required>
                     <button type="submit">Edit</button>
                 </form>
-
-                <!-- Delete Form -->
-                <form action="/conversation/delete/<%= conversation._id %>?_method=DELETE" method="POST" style="display: inline">
+                <form action="/conversation/delete/<%= conversation._id %>?_method=DELETE" method="POST" style="display: inline;">
                     <button type="submit">Delete</button>
                 </form>
             </li>
         <% }); %>
     </ul>
-
-    <!-- Start a New Conversation -->
     <h2>Start a New Conversation</h2>
     <form action="/conversation/start" method="POST">
-        <input type="text" name="title" placeholder="Conversation  Title" required>
+        <input type="text" name="title" placeholder="Conversation Title" required>
         <button type="submit">Start</button>
     </form>
-
-    <!-- Start an AI Conversation-->
-     <form action="/conversation/ai" method="POST">
-        <input type="hidden" name="conversationId" value="<% conversation._id %>">
-        <input type="text" name="prompt" placeholder="Enter your prompt" required>
-        <button type="submit">Send to AI</button>
-     </form>
-
+    <a href="/logout">Logout</a>
 </body>
 </html>
