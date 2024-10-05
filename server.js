@@ -4,9 +4,15 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const path = require('path');
 const methodOverride = require('method-override')
-
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Imported Authorization Controllers
+const authController = require('./controllers/authController');
+// Imported Conversation Controllers
+const conversationController = require('./controllers/conversationController');
+// Imported AI Controllers
+const aiController = require('./controllers/aiController');
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
@@ -38,9 +44,6 @@ app.get('/', (req, res)=>{
     res.send('Server is running baby!');
 });
 
-// Imported Authorization Controllers
-const authController = require('./controllers/authController');
-
 // Routes for authentication
 app.get('/signup', authController.signupPage);
 app.post('/signup', authController.signup);
@@ -48,14 +51,14 @@ app.get('/login', authController.loginPage);
 app.post('/login', authController.login);
 app.get('/logout', authController.logout);
 
-// Imported Conversation Controllers
-const conversationController = require('./controllers/conversationController');
-
 // Routes for conversations
 app.get('/dashboard', conversationController.viewConversations);
 app.post('/conversation/start', conversationController.startConversation);
 app.put('/conversation/edit', conversationController.editConversation);
 app.delete('/conversation/delete/:conversationId', conversationController.deleteConversation);
+
+// Routes to start AI conversation
+app.post('/conversation/ai', aiController.startAIConversation);
 
 // Start the server
 app.listen(PORT, ()=>{

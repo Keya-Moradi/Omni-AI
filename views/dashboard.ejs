@@ -35,5 +35,13 @@
         <input type="text" name="title" placeholder="Conversation  Title" required>
         <button type="submit">Start</button>
     </form>
+
+    <!-- Start an AI Conversation-->
+     <form action="/conversation/ai" method="POST">
+        <input type="hidden" name="conversationId" value="<% conversation._id %>">
+        <input type="text" name="prompt" placeholder="Enter your prompt" required>
+        <button type="submit">Send to AI</button>
+     </form>
+
 </body>
 </html>
