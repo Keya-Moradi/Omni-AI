@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
+const mongoose = require('mongoose'); // Import mongoose only once here
 const session = require('express-session');
 const path = require('path');
 const methodOverride = require('method-override');
