@@ -1,7 +1,8 @@
 require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose'); // Import mongoose only once here
+const mongoose = require('mongoose');
 const session = require('express-session');
+const MongoStore = require('connect-mongo'); // Import connect-mongo
 const path = require('path');
 const methodOverride = require('method-override');
 const app = express();
@@ -20,13 +21,6 @@ app.use(methodOverride('_method'));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Session Management
-app.use(session({
-    secret: 'your-secret-key',
-    resave: false,
-    saveUninitialized: true,
-}));
-
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
@@ -35,6 +29,17 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
     .catch((error) => {
         console.error('MongoDB connection error:', error);
     });
+
+// Session Management using MongoDB store
+app.use(session({
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: true,
+    store: MongoStore.create({
+        mongoUrl: process.env.MONGODB_URI,
+        collectionName: 'sessions',
+    }),
+}));
 
 // Home Route
 app.get('/', (req, res) => {
