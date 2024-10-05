@@ -3,7 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const path = require('path');
-const methodOverride = require('method-override')
+const methodOverride = require('method-override');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -64,6 +64,6 @@ app.delete('/conversation/delete/:conversationId', conversationController.delete
 app.post('/conversation/ai', aiController.startAIConversation);
 
 // Start the server
-app.listen(PORT, ()=>{
+app.listen(PORT, () => {
     console.log(`Server is running on the beautiful port of http://localhost:${PORT}`);
 });

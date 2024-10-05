@@ -7,16 +7,16 @@
 </head>
 <body>
     <h1>AI Chatbox</h1>
-    <h2>Topic: <% conversation.title %></h2>
+    <h2>Topic: <%= conversation.title %></h2>
 
     <!-- Display conversation messages -->
-     <div id="messages">
+    <div id="messages">
         <% conversation.messages.forEach(function(message) { %>
             <p><strong><%= message.sender %>:</strong> <%= message.content %></p>
         <% }); %>
-     </div>
+    </div>
 
-     <!-- Prompt input form -->
+    <!-- Prompt input form -->
     <form action="/conversation/ai" method="POST">
         <input type="hidden" name="conversationId" value="<%= conversation._id %>">
         <input type="text" name="prompt" placeholder="Enter your prompt" required>
