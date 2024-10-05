@@ -7,11 +7,9 @@ const methodOverride = require('method-override');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Imported Authorization Controllers
+// Imported Controllers
 const authController = require('./controllers/authController');
-// Imported Conversation Controllers
 const conversationController = require('./controllers/conversationController');
-// Imported AI Controllers
 const aiController = require('./controllers/aiController');
 
 // Middleware
