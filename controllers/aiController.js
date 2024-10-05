@@ -57,55 +57,55 @@ const getGeminiResponse = async (conversationHistory) => {
 // Handle AI conversation flow
 exports.startAIConversation = async (req, res) => {
     console.log('startAIConversation method called');
-    try {
-        const userId = req.session.userId;
-        const { conversationId, prompt } = req.body;
+    // try {
+    //     const userId = req.session.userId;
+    //     const { conversationId, prompt } = req.body;
 
-        if (!userId) {
-            return res.status(401).send('Unauthorized');
-        }
+    //     if (!userId) {
+    //         return res.status(401).send('Unauthorized');
+    //     }
 
-         // Debugging API keys
-         console.log('OpenAI API Key:', OPENAI_API_KEY);
-         console.log('Google API Key:', process.env.GOOGLE_API_KEY);
+    //      // Debugging API keys
+    //      console.log('OpenAI API Key:', OPENAI_API_KEY);
+    //      console.log('Google API Key:', process.env.GOOGLE_API_KEY);
 
-        console.log('Received prompt:', prompt); // Debugging
-        console.log('Conversation ID:', conversationId); // Debugging
+    //     console.log('Received prompt:', prompt); // Debugging
+    //     console.log('Conversation ID:', conversationId); // Debugging
 
-        // Fetch the existing conversation to get the previous messages
-        const conversation = await queries.getConversationById(conversationId);
-        let conversationHistory = conversation.messages.map((msg) => `${msg.sender}: ${msg.content}`).join('\n');
+    //     // Fetch the existing conversation to get the previous messages
+    //     const conversation = await queries.getConversationById(conversationId);
+    //     let conversationHistory = conversation.messages.map((msg) => `${msg.sender}: ${msg.content}`).join('\n');
         
-        // Include the original prompt in the conversation history
-        conversationHistory += `\nUser: ${prompt}`;
+    //     // Include the original prompt in the conversation history
+    //     conversationHistory += `\nUser: ${prompt}`;
 
-        // Step 1: Get response from ChatGPT
-        const chatGPTResponse = await getChatGPTResponse(conversationHistory);
-        console.log('ChatGPT Response:', chatGPTResponse); // Debugging
+    //     // Step 1: Get response from ChatGPT
+    //     const chatGPTResponse = await getChatGPTResponse(conversationHistory);
+    //     console.log('ChatGPT Response:', chatGPTResponse); // Debugging
 
-        // Step 2: Append ChatGPT's response to conversation history and pass it to Gemini
-        conversationHistory += `\nChatGPT: ${chatGPTResponse}`;
-        const geminiResponse = await getGeminiResponse(conversationHistory);
-        console.log('Gemini Response:', geminiResponse); // Debugging
+    //     // Step 2: Append ChatGPT's response to conversation history and pass it to Gemini
+    //     conversationHistory += `\nChatGPT: ${chatGPTResponse}`;
+    //     const geminiResponse = await getGeminiResponse(conversationHistory);
+    //     console.log('Gemini Response:', geminiResponse); // Debugging
 
-        // Step 3: Store all responses as messages in the conversation
-        const messages = [
-            { sender: 'user', content: prompt },
-            { sender: 'ChatGPT', content: chatGPTResponse },
-            { sender: 'Gemini', content: geminiResponse }
-        ];
+    //     // Step 3: Store all responses as messages in the conversation
+    //     const messages = [
+    //         { sender: 'user', content: prompt },
+    //         { sender: 'ChatGPT', content: chatGPTResponse },
+    //         { sender: 'Gemini', content: geminiResponse }
+    //     ];
 
-        // Create message entries in the database
-        const messageDocs = await Message.insertMany(messages);
-        const messageIds = messageDocs.map((msg) => msg._id);
+    //     // Create message entries in the database
+    //     const messageDocs = await Message.insertMany(messages);
+    //     const messageIds = messageDocs.map((msg) => msg._id);
 
-        // Add messages to the conversation
-        await queries.addMessagesToConversation(conversationId, messageIds);
+    //     // Add messages to the conversation
+    //     await queries.addMessagesToConversation(conversationId, messageIds);
 
-        // Redirect to display the updated conversation
-        res.redirect(`/conversation/${conversationId}`);
-    } catch (error) {
-        console.error('Error in AI conversation:', error);
-        res.status(500).send('An error occurred while processing the AI conversation. Please try again.');
-    }
+    //     // Redirect to display the updated conversation
+    //     res.redirect(`/conversation/${conversationId}`);
+    // } catch (error) {
+    //     console.error('Error in AI conversation:', error);
+    //     res.status(500).send('An error occurred while processing the AI conversation. Please try again.');
+    // }
 };
