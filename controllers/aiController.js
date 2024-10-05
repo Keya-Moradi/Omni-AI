@@ -56,6 +56,7 @@ const getGeminiResponse = async (conversationHistory) => {
 
 // Handle AI conversation flow
 exports.startAIConversation = async (req, res) => {
+    console.log('startAIConversation method called');
     try {
         const userId = req.session.userId;
         const { conversationId, prompt } = req.body;
