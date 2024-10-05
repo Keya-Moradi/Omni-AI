@@ -14,7 +14,7 @@ exports.signup = async (req, res) => {
         // Check if username already exists
         const existingUser = await User.findOne({ username });
         if (existingUser) {
-            return res.render('login', { message: 'Username already exists baby!' });
+            return res.render('login', { message: 'Username already exists.' });
         }
 
         // Hash password
@@ -31,15 +31,15 @@ exports.signup = async (req, res) => {
         });
 
         await newUser.save();
-        req.session.userID = newUser._id;
+        req.session.userId = newUser._id;
         res.redirect('/dashboard');
     } catch (error) {
         console.error('Signup error:', error);
-        res.render('login', { message: 'Signup failed. Try again baby!' })
+        res.render('login', { message: 'An error occurred during signup. Please try again.' });
     }
 };
 
-// Render login pager
+// Render login page
 exports.loginPage = (req, res) => {
     res.render('login', { message: '' });
 };
@@ -52,26 +52,27 @@ exports.login = async (req, res) => {
         // Find user by username
         const user = await User.findOne({ username });
         if (!user) {
-            return res.render('login', { message: 'Please try again. Invalid credentials baby!' });
+            return res.render('login', { message: 'Invalid username or password.' });
         }
+
         // Compare passwords
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.render('login', { message: 'Please try again. Invalid credentials baby!' });
+            return res.render('login', { message: 'Invalid username or password.' });
         }
 
         // Store user ID in session
-        req.session.userID = user._id;
+        req.session.userId = user._id;
         res.redirect('/dashboard');
     } catch (error) {
         console.error('Login error:', error);
-        res.render('login', { message: 'Login failed. Try again baby!' });
+        res.render('login', { message: 'An error occurred during login. Please try again.' });
     }
 };
 
-// Handle Logout for user
+// Handle user logout
 exports.logout = (req, res) => {
     req.session.destroy(() => {
-        res.render('logout', { message: 'You have been logged out. See you soon baby!' });
+        res.render('logout', { message: 'You are now logged out. See you soon!' });
     });
 };

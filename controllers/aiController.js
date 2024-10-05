@@ -1,4 +1,5 @@
 const axios = require('axios');
+const queries = require('../queries');
 const Conversation = require('../models/Conversation');
 const Message = require('../models/Message');
 
@@ -53,7 +54,7 @@ exports.startAIConversation = async (req, res) => {
         }
 
         // Fetch the existing conversation to get the previous messages
-        const conversation = await Conversation.findById(conversationId).populate('messages').exec();
+        const conversation = await queries.getConversationById(conversationId);
         let conversationHistory = conversation.messages.map((msg) => `${msg.sender}: ${msg.content}`).join('\n');
         
         // Include the original prompt in the conversation history
@@ -78,11 +79,11 @@ exports.startAIConversation = async (req, res) => {
         const messageIds = messageDocs.map((msg) => msg._id);
 
         // Add messages to the conversation
-        await Conversation.findByIdAndUpdate(conversationId, { $push: { messages: { $each: messageIds } } });
+        await queries.addMessagesToConversation(conversationId, messageIds);
 
         res.status(200).send('AI conversation completed');
     } catch (error) {
         console.error('Error in AI conversation:', error);
-        res.status(500).send('Error processing AI conversation.');
+        res.status(500).send('An error occurred while processing the AI conversation. Please try again.');
     }
 };

@@ -1,8 +1,8 @@
+const queries = require('../queries');
 const Conversation = require('../models/Conversation');
-const Message = require('../models/Message');
 const User = require('../models/User');
 
-// Render the dashboard with the users's conversations
+// Render the dashboard with the user's conversations
 exports.viewConversations = async (req, res) => {
     try {
         const userId = req.session.userId;
@@ -10,11 +10,11 @@ exports.viewConversations = async (req, res) => {
             return res.redirect('/login');
         }
 
-        //find user conversations in reverse-chronological order
+        // Fetch user conversations
         const user = await User.findById(userId).populate('conversations').exec();
-        const conversations = user.conversations.sort((a, b) => b._id.getTimestamp() -a._id.getTimestamp());
+        const conversations = user.conversations.sort((a, b) => b._id.getTimestamp() - a._id.getTimestamp());
 
-    res.render('dashboard', { conversations });
+        res.render('dashboard', { conversations });
     } catch (error) {
         console.error('Error fetching conversations:', error);
         res.redirect('/login');
@@ -26,27 +26,27 @@ exports.startConversation = async (req, res) => {
     try {
         const userId = req.session.userId;
         if (!userId) {
-            return res.redirect('/login');
+            return res.status(401).send('Unauthorized');
         }
 
-        const { title } = req.body
+        const { title } = req.body;
 
         // Create a new conversation
         const newConversation = new Conversation({
             user: userId,
-            title, 
+            title,
             messages: []
         });
 
         await newConversation.save();
 
-        /// Add conversation to user's conversations
-        await User.findByIdAndUpdate(userId, { $push: { conversations: newConversation._id }});
+        // Add conversation to user's conversations
+        await User.findByIdAndUpdate(userId, { $push: { conversations: newConversation._id } });
 
         res.redirect('/dashboard');
     } catch (error) {
         console.error('Error starting conversation:', error);
-        res.redirect('/dashboard');
+        res.status(500).send('An error occurred while starting the conversation. Please try again.');
     }
 };
 
@@ -63,17 +63,17 @@ exports.deleteConversation = async (req, res) => {
         // Find and delete the conversation
         await Conversation.findByIdAndDelete(conversationId);
 
-        // Remove conversation from user's conversations
-        await User.findByIdAndUpdate(userId, { $pull: { conversations: conversationId}});
+        // Remove conversation reference from user's conversations
+        await User.findByIdAndUpdate(userId, { $pull: { conversations: conversationId } });
 
-        res.status(200).send('Conversation deleted successfully baby!');
+        res.status(200).send('Conversation deleted successfully.');
     } catch (error) {
         console.error('Error deleting conversation:', error);
-        res.status(500).send('Error deleting conversation');
+        res.status(500).send('An error occurred while deleting the conversation. Please try again.');
     }
-        };
+};
 
-// Edit a previous conversation (restarts the conversation with new prompts)
+// Edit a past conversation (restarts the conversation with new prompts)
 exports.editConversation = async (req, res) => {
     try {
         const userId = req.session.userId;
@@ -84,11 +84,11 @@ exports.editConversation = async (req, res) => {
         }
 
         // Update the conversation title
-        await Conversation.findByIdAndUpdate(conversationId, { title: newTitle});
+        await Conversation.findByIdAndUpdate(conversationId, { title: newTitle });
 
-        res.status(200).send('Conversation updated successfully baby!');
+        res.status(200).send('Conversation updated successfully.');
     } catch (error) {
         console.error('Error editing conversation:', error);
-        res.status(500).send('Error editing conversation');
+        res.status(500).send('An error occurred while editing the conversation. Please try again.');
     }
-    };
+};
