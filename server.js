@@ -39,8 +39,12 @@ mongoose.connect(process.env.MONGODB_URI)
     });
 
 // Home Route
-app.get('/', (req, res)=>{
-    res.send('Server is running baby!');
+app.get('/', (req, res) => {
+    if (req.session.userId) {
+        res.redirect('/dashboard');
+    } else {
+        res.redirect('/login');
+    }
 });
 
 // Routes for authentication
