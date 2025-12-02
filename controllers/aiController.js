@@ -17,19 +17,25 @@ const auth = new GoogleAuth({
 const getChatGPTResponse = async (conversationHistory) => {
     try {
         const response = await axios.post(
-            'https://api.openai.com/v1/completions',
+            'https://api.openai.com/v1/chat/completions',
             {
-                model: 'gpt-4',
-                prompt: conversationHistory,
+                model: 'gpt-3.5-turbo',
+                messages: [
+                    { 
+                        role: 'user', 
+                        content: conversationHistory 
+                    }
+                ],
                 max_tokens: 150
             },
             {
                 headers: {
-                    'Authorization': `Bearer ${OPENAI_API_KEY}`
+                    'Authorization': `Bearer ${OPENAI_API_KEY}`,
+                    'Content-Type': 'application/json'
                 }
             }
         );
-        return response.data.choices[0].text.trim();
+        return response.data.choices[0].message.content;
     } catch (error) {
         console.error('Error getting ChatGPT response:', error.response ? error.response.data : error.message);
         return 'Error communicating with ChatGPT.';
@@ -40,9 +46,17 @@ const getChatGPTResponse = async (conversationHistory) => {
 const getGeminiResponse = async (conversationHistory) => {
     try {
         const response = await axios.post(
-            'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=' + process.env.GOOGLE_API_KEY,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${process.env.GOOGLE_API_KEY}`,
             {
-                contents: [{ parts: [{ text: conversationHistory }] }]
+                contents: [
+                    { 
+                        parts: [
+                            { 
+                                text: conversationHistory 
+                            }
+                        ] 
+                    }
+                ]
             },
             {
                 headers: {
@@ -50,7 +64,13 @@ const getGeminiResponse = async (conversationHistory) => {
                 }
             }
         );
-        return response.data.response.trim(); // Adjust based on actual API response structure
+        
+        // Correct path to access Gemini response
+        if (response.data && response.data.candidates && response.data.candidates[0]) {
+            return response.data.candidates[0].content.parts[0].text;
+        } else {
+            return 'No response from Gemini.';
+        }
     } catch (error) {
         console.error('Error getting Gemini response:', error.response ? error.response.data : error.message);
         return 'Error communicating with Gemini.';
