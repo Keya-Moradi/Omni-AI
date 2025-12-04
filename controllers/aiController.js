@@ -1,17 +1,9 @@
 const axios = require('axios');
-const { GoogleAuth } = require('google-auth-library');
 const queries = require('../queries');
 const Message = require('../models/Message');
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const GOOGLE_PROJECT_ID = process.env.GOOGLE_PROJECT_ID; // Your Google Cloud Project ID
-const GOOGLE_SERVICE_ACCOUNT_PATH = process.env.GOOGLE_SERVICE_ACCOUNT_PATH; // Path to your service account JSON file
-
-// Set up Google Auth client
-const auth = new GoogleAuth({
-    keyFile: GOOGLE_SERVICE_ACCOUNT_PATH,
-    scopes: ['https://www.googleapis.com/auth/cloud-platform'],
-});
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 
 // Helper function to send a request to the ChatGPT API
 const getChatGPTResponse = async (conversationHistory) => {
@@ -46,7 +38,7 @@ const getChatGPTResponse = async (conversationHistory) => {
 const getGeminiResponse = async (conversationHistory) => {
     try {
         const response = await axios.post(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${process.env.GOOGLE_API_KEY}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GOOGLE_API_KEY}`,
             {
                 contents: [
                     { 
@@ -88,17 +80,17 @@ exports.startAIConversation = async (req, res) => {
             return res.status(401).send('Unauthorized');
         }
 
-        // Debugging API keys
-        console.log('OpenAI API Key:', OPENAI_API_KEY);
-        console.log('Google API Key:', process.env.GOOGLE_API_KEY);
+        if (!OPENAI_API_KEY || !GOOGLE_API_KEY) {
+            return res.status(500).send('AI services are not configured. Please set OPENAI_API_KEY and GOOGLE_API_KEY.');
+        }
 
         console.log('Received prompt:', prompt); // Debugging
         console.log('Conversation ID:', conversationId); // Debugging
 
         // Fetch the existing conversation to get the previous messages
-        const conversation = await queries.getConversationById(conversationId);
+        const conversation = await queries.getConversationById(conversationId, userId);
         if (!conversation) {
-            return res.status(404).send('Conversation not found');
+            return res.status(404).send('Conversation not found or unauthorized');
         }
 
         let conversationHistory = conversation.messages.map((msg) => `${msg.sender}: ${msg.content}`).join('\n');
@@ -127,7 +119,7 @@ exports.startAIConversation = async (req, res) => {
         const messageIds = messageDocs.map((msg) => msg._id);
 
         // Add messages to the conversation
-        await queries.addMessagesToConversation(conversationId, messageIds);
+        await queries.addMessagesToConversation(conversationId, messageIds, userId);
 
         // Redirect to display the updated conversation
         res.redirect(`/conversation/${conversationId}`);

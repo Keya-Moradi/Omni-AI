@@ -2,9 +2,13 @@ const Conversation = require('./models/Conversation');
 const Message = require('./models/Message');
 
 // Fetch a conversation by ID
-exports.getConversationById = async (conversationId) => {
+exports.getConversationById = async (conversationId, userId) => {
     try {
-        return await Conversation.findById(conversationId).populate('messages').exec();
+        const filter = { _id: conversationId };
+        if (userId) {
+            filter.user = userId;
+        }
+        return await Conversation.findOne(filter).populate('messages').exec();
     } catch (error) {
         console.error('Error fetching conversation by ID:', error);
         throw error;
@@ -12,9 +16,13 @@ exports.getConversationById = async (conversationId) => {
 };
 
 // Add messages to a conversation
-exports.addMessagesToConversation = async (conversationId, messages) => {
+exports.addMessagesToConversation = async (conversationId, messages, userId) => {
     try {
-        return await Conversation.findByIdAndUpdate(conversationId, { $push: { messages: { $each: messages } } });
+        const filter = { _id: conversationId };
+        if (userId) {
+            filter.user = userId;
+        }
+        return await Conversation.findOneAndUpdate(filter, { $push: { messages: { $each: messages } } });
     } catch (error) {
         console.error('Error adding messages to conversation:', error);
         throw error;
@@ -34,9 +42,13 @@ exports.createConversation = async (userId, title) => {
 };
 
 // Delete a conversation by ID
-exports.deleteConversationById = async (conversationId) => {
+exports.deleteConversationById = async (conversationId, userId) => {
     try {
-        return await Conversation.findByIdAndDelete(conversationId);
+        const filter = { _id: conversationId };
+        if (userId) {
+            filter.user = userId;
+        }
+        return await Conversation.findOneAndDelete(filter);
     } catch (error) {
         console.error('Error deleting conversation by ID:', error);
         throw error;
@@ -44,9 +56,13 @@ exports.deleteConversationById = async (conversationId) => {
 };
 
 // Update conversation title
-exports.updateConversationTitle = async (conversationId, newTitle) => {
+exports.updateConversationTitle = async (conversationId, newTitle, userId) => {
     try {
-        return await Conversation.findByIdAndUpdate(conversationId, { title: newTitle });
+        const filter = { _id: conversationId };
+        if (userId) {
+            filter.user = userId;
+        }
+        return await Conversation.findOneAndUpdate(filter, { title: newTitle });
     } catch (error) {
         console.error('Error updating conversation title:', error);
         throw error;

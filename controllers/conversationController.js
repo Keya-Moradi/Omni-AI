@@ -1,5 +1,6 @@
 const queries = require('../queries');
 const User = require('../models/User');
+const Message = require('../models/Message');
 
 // Render the dashboard with the user's conversations
 exports.viewConversations = async (req, res) => {
@@ -11,7 +12,11 @@ exports.viewConversations = async (req, res) => {
 
         // Fetch user conversations
         const user = await User.findById(userId).populate('conversations').exec();
-        const conversations = user.conversations.sort((a, b) => b._id.getTimestamp() - a._id.getTimestamp());
+        const conversations = user.conversations.sort((a, b) => {
+            const aTime = a.createdAt || a._id.getTimestamp();
+            const bTime = b.createdAt || b._id.getTimestamp();
+            return bTime - aTime;
+        });
 
         res.render('dashboard', { conversations });
     } catch (error) {
@@ -53,8 +58,18 @@ exports.deleteConversation = async (req, res) => {
             return res.status(401).send('Unauthorized');
         }
 
+        const conversation = await queries.getConversationById(conversationId, userId);
+        if (!conversation) {
+            return res.status(404).send('Conversation not found or unauthorized.');
+        }
+
         // Delete the conversation using queries.js
-        await queries.deleteConversationById(conversationId);
+        await queries.deleteConversationById(conversationId, userId);
+
+        // Remove associated messages to avoid orphaned docs
+        if (conversation.messages && conversation.messages.length) {
+            await Message.deleteMany({ _id: { $in: conversation.messages } });
+        }
 
         // Remove conversation reference from user's conversations
         await User.findByIdAndUpdate(userId, { $pull: { conversations: conversationId } });
@@ -76,8 +91,10 @@ exports.editConversation = async (req, res) => {
             return res.status(401).send('Unauthorized');
         }
 
-        // Update the conversation title using queries.js
-        await queries.updateConversationTitle(conversationId, newTitle);
+        const updated = await queries.updateConversationTitle(conversationId, newTitle, userId);
+        if (!updated) {
+            return res.status(404).send('Conversation not found or unauthorized.');
+        }
 
         res.status(200).send('Conversation updated successfully.');
     } catch (error) {

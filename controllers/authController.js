@@ -20,13 +20,22 @@ exports.signup = async (req, res) => {
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        let parsedPreferences = {};
+        if (preferences) {
+            try {
+                parsedPreferences = JSON.parse(preferences);
+            } catch (parseErr) {
+                parsedPreferences = { notes: preferences };
+            }
+        }
+
         // Create new user
         const newUser = new User({
             username,
             password: hashedPassword,
             email,
             profile_info,
-            preferences,
+            preferences: parsedPreferences,
             conversations: []
         });
 

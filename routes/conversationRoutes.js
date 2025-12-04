@@ -15,7 +15,7 @@ router.get('/conversation/:conversationId', async (req, res) => {
         }
         
         const queries = require('../queries');
-        const conversation = await queries.getConversationById(req.params.conversationId);
+        const conversation = await queries.getConversationById(req.params.conversationId, userId);
         
         if (!conversation) {
             return res.redirect('/dashboard');

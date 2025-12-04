@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
     },
     preferences: {
         type: Object,
-        required: true
+        default: {}
     },
     conversations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Conversation'}]
 });
