@@ -8,6 +8,8 @@ const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 const GEMINI_MODEL = process.env.GOOGLE_GEMINI_MODEL || 'gemini-1.5-flash-latest';
 const GEMINI_API_BASE = process.env.GOOGLE_GEMINI_API_BASE || 'https://generativelanguage.googleapis.com';
 const MAX_AI_TURNS = parseInt(process.env.AI_TURNS_LIMIT || '1', 10);
+const CHATGPT_SYSTEM_PROMPT = 'You are ChatGPT. Respond concisely and label yourself as ChatGPT. Do not impersonate Gemini.';
+const GEMINI_SYSTEM_PROMPT = 'You are Gemini. Respond concisely and label yourself as Gemini. Do not impersonate ChatGPT.';
 
 // Helper function to send a request to the ChatGPT API
 const getChatGPTResponse = async (conversationHistory) => {
@@ -17,10 +19,8 @@ const getChatGPTResponse = async (conversationHistory) => {
             {
                 model: 'gpt-3.5-turbo',
                 messages: [
-                    { 
-                        role: 'user', 
-                        content: conversationHistory 
-                    }
+                    { role: 'system', content: CHATGPT_SYSTEM_PROMPT },
+                    { role: 'user', content: conversationHistory }
                 ],
                 max_tokens: 150
             },
@@ -48,7 +48,7 @@ const getGeminiResponse = async (conversationHistory) => {
                     { 
                         parts: [
                             { 
-                                text: conversationHistory 
+                                text: `${GEMINI_SYSTEM_PROMPT}\n\n${conversationHistory}` 
                             }
                         ] 
                     }
