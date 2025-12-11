@@ -5,6 +5,7 @@ const Message = require('../models/Message');
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
+const GEMINI_MODEL = process.env.GOOGLE_GEMINI_MODEL || 'gemini-1.5-flash';
 
 // Helper function to send a request to the ChatGPT API
 const getChatGPTResponse = async (conversationHistory) => {
@@ -39,7 +40,7 @@ const getChatGPTResponse = async (conversationHistory) => {
 const getGeminiResponse = async (conversationHistory) => {
     try {
         const response = await axios.post(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GOOGLE_API_KEY}`,
+            `https://generativelanguage.googleapis.com/v1/models/${GEMINI_MODEL}:generateContent?key=${GOOGLE_API_KEY}`,
             {
                 contents: [
                     { 
@@ -65,8 +66,9 @@ const getGeminiResponse = async (conversationHistory) => {
             return 'No response from Gemini.';
         }
     } catch (error) {
+        const errorMsg = error.response?.data?.error?.message || error.message;
         console.error('Error getting Gemini response:', error.response ? error.response.data : error.message);
-        return 'Error communicating with Gemini.';
+        return `Error communicating with Gemini: ${errorMsg}`;
     }
 };
 
