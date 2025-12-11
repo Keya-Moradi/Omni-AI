@@ -5,6 +5,9 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const path = require('path');
 const methodOverride = require('method-override');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const csrf = require('csurf');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -15,10 +18,31 @@ if (missingEnvs.length) {
     process.exit(1);
 }
 
+if (process.env.NODE_ENV === 'production' || process.env.TRUST_PROXY === 'true') {
+    app.set('trust proxy', 1);
+}
+
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 20,
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const aiLimiter = rateLimit({
+    windowMs: 5 * 60 * 1000,
+    max: 30,
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const csrfProtection = csrf();
+
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(methodOverride('_method'));
+app.use(helmet());
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -42,6 +66,16 @@ const startServer = async () => {
                 secure: process.env.NODE_ENV === 'production',
             },
         }));
+
+        app.use(csrfProtection);
+        app.use((req, res, next) => {
+            res.locals.csrfToken = req.csrfToken();
+            next();
+        });
+
+        // Rate limiting
+        app.use(['/login', '/signup'], authLimiter);
+        app.use(['/conversation/start', '/conversation/edit', '/conversation/delete', '/conversation/ai'], aiLimiter);
 
         // Routes
         app.use('/', require('./routes/authRoutes'));
@@ -67,3 +101,11 @@ const startServer = async () => {
 };
 
 startServer();
+
+// CSRF error handler
+app.use((err, req, res, next) => {
+    if (err.code === 'EBADCSRFTOKEN') {
+        return res.status(403).send('Invalid CSRF token');
+    }
+    return next(err);
+});

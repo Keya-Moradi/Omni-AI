@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const { validationResult } = require('express-validator');
 const User = require('../models/User');
 
 // Render signup page
@@ -9,6 +10,11 @@ exports.signupPage = (req, res) => {
 // Handle user signup
 exports.signup = async (req, res) => {
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).render('login', { message: errors.array()[0].msg });
+        }
+
         const { username, password, email, profile_info, preferences } = req.body;
 
         // Check if username already exists
@@ -56,6 +62,11 @@ exports.loginPage = (req, res) => {
 // Handle user login
 exports.login = async (req, res) => {
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).render('login', { message: errors.array()[0].msg });
+        }
+
         const { username, password } = req.body;
 
         // Find user by username

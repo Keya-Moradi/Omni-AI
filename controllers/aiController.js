@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { validationResult } = require('express-validator');
 const queries = require('../queries');
 const Message = require('../models/Message');
 
@@ -78,6 +79,11 @@ exports.startAIConversation = async (req, res) => {
 
         if (!userId) {
             return res.status(401).send('Unauthorized');
+        }
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).send(errors.array()[0].msg);
         }
 
         if (!OPENAI_API_KEY || !GOOGLE_API_KEY) {

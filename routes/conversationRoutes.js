@@ -1,12 +1,23 @@
 const express = require('express');
 const router = express.Router();
 const conversationController = require('../controllers/conversationController');
+const { body, param } = require('express-validator');
 
 // Conversation routes
 router.get('/dashboard', conversationController.viewConversations);
-router.post('/conversation/start', conversationController.startConversation);
-router.put('/conversation/edit', conversationController.editConversation);
-router.delete('/conversation/delete/:conversationId', conversationController.deleteConversation);
+router.post('/conversation/start',
+    body('title').trim().isLength({ min: 1, max: 200 }).withMessage('Title is required and must be under 200 characters.'),
+    conversationController.startConversation
+);
+router.put('/conversation/edit',
+    body('conversationId').trim().isMongoId().withMessage('Valid conversation ID required.'),
+    body('newTitle').trim().isLength({ min: 1, max: 200 }).withMessage('New title is required and must be under 200 characters.'),
+    conversationController.editConversation
+);
+router.delete('/conversation/delete/:conversationId',
+    param('conversationId').isMongoId().withMessage('Valid conversation ID required.'),
+    conversationController.deleteConversation
+);
 router.get('/conversation/:conversationId', async (req, res) => {
     try {
         const userId = req.session.userId;

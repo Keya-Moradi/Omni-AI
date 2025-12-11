@@ -19,6 +19,7 @@
 
     <!-- Prompt input form -->
     <form action="/conversation/ai" method="POST">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <input type="hidden" name="conversationId" value="<%= conversation._id %>">
         <input type="text" name="prompt" placeholder="Enter your prompt" required>
         <button type="submit">Send to AI</button>

@@ -16,11 +16,13 @@
     </a>
                 <div>
                     <form action="/conversation/edit?_method=PUT" method="POST">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                         <input type="hidden" name="conversationId" value="<%= conversation._id %>">
                         <input type="text" name="newTitle" placeholder="New Title" required>
                         <button type="submit">Edit</button>
                     </form>
                     <form action="/conversation/delete/<%= conversation._id %>?_method=DELETE" method="POST">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                         <button type="submit">Delete</button>
                     </form>
                 </div>
@@ -29,6 +31,7 @@
     </ul>
     <h2>Start a New Conversation</h2>
     <form action="/conversation/start" method="POST">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <input type="text" name="title" placeholder="Conversation Title" required>
         <button type="submit">Start</button>
     </form>

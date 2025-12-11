@@ -1,6 +1,7 @@
 const queries = require('../queries');
 const User = require('../models/User');
 const Message = require('../models/Message');
+const { validationResult } = require('express-validator');
 
 // Render the dashboard with the user's conversations
 exports.viewConversations = async (req, res) => {
@@ -33,6 +34,11 @@ exports.startConversation = async (req, res) => {
             return res.status(401).send('Unauthorized');
         }
 
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).send(errors.array()[0].msg);
+        }
+
         const { title } = req.body;
 
         // Create a new conversation using queries.js
@@ -56,6 +62,11 @@ exports.deleteConversation = async (req, res) => {
 
         if (!userId) {
             return res.status(401).send('Unauthorized');
+        }
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).send(errors.array()[0].msg);
         }
 
         const conversation = await queries.getConversationById(conversationId, userId);
@@ -89,6 +100,11 @@ exports.editConversation = async (req, res) => {
 
         if (!userId) {
             return res.status(401).send('Unauthorized');
+        }
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).send(errors.array()[0].msg);
         }
 
         const updated = await queries.updateConversationTitle(conversationId, newTitle, userId);
