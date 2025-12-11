@@ -16,10 +16,11 @@ The idea behind this app was to create a tool that would facilitate a more inter
 
 ## Features
 
-- User authentication (signup, login, logout)
-- Create, edit, and delete AI conversations
-- Real-time interaction between multiple AI entities
-- User guidance to influence AI responses
+- User authentication (signup, login, logout) with session storage in MongoDB
+- Create, edit, view, and delete conversations tied to the logged-in user
+- Multi-AI back-and-forth: ChatGPT and Gemini alternate responses using shared conversation context (default 1 turn each per prompt; configurable)
+- Form CSRF protection, input validation, and rate limiting on auth/AI routes
+- Static EJS views for login, dashboard, and chatbox
 
 ## Screenshot
 
@@ -46,10 +47,10 @@ The idea behind this app was to create a tool that would facilitate a more inter
 - **MongoDB (Mongoose)**
 - **EJS (Embedded JavaScript Templates)**
 - **Axios**
-- **Google Auth Library**
-- **OpenAI API**
-- **Google Cloud API (Gemini)**
+- **OpenAI API (ChatGPT)**
+- **Google Generative Language API (Gemini)**
 - **HTML/CSS**
+- **Security middleware:** Helmet, express-session with MongoStore, express-rate-limit, csurf, express-validator
 
 ## Next Steps (Stretch Goals)
 

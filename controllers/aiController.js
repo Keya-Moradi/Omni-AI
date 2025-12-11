@@ -7,7 +7,7 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 const GEMINI_MODEL = process.env.GOOGLE_GEMINI_MODEL || 'gemini-1.5-flash-latest';
 const GEMINI_API_BASE = process.env.GOOGLE_GEMINI_API_BASE || 'https://generativelanguage.googleapis.com';
-const MAX_AI_TURNS = parseInt(process.env.AI_TURNS_LIMIT || '3', 10);
+const MAX_AI_TURNS = parseInt(process.env.AI_TURNS_LIMIT || '1', 10);
 
 // Helper function to send a request to the ChatGPT API
 const getChatGPTResponse = async (conversationHistory) => {
