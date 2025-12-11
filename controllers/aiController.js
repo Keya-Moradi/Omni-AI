@@ -7,6 +7,7 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 const GEMINI_MODEL = process.env.GOOGLE_GEMINI_MODEL || 'gemini-1.5-flash-latest';
 const GEMINI_API_BASE = process.env.GOOGLE_GEMINI_API_BASE || 'https://generativelanguage.googleapis.com';
+const MAX_AI_TURNS = parseInt(process.env.AI_TURNS_LIMIT || '3', 10);
 
 // Helper function to send a request to the ChatGPT API
 const getChatGPTResponse = async (conversationHistory) => {
@@ -75,7 +76,6 @@ const getGeminiResponse = async (conversationHistory) => {
 
 // Handle AI conversation flow
 exports.startAIConversation = async (req, res) => {
-    console.log('startAIConversation method called');
     try {
         const userId = req.session.userId;
         const { conversationId, prompt } = req.body;
@@ -93,9 +93,6 @@ exports.startAIConversation = async (req, res) => {
             return res.status(500).send('AI services are not configured. Please set OPENAI_API_KEY and GOOGLE_API_KEY.');
         }
 
-        console.log('Received prompt:', prompt); // Debugging
-        console.log('Conversation ID:', conversationId); // Debugging
-
         // Fetch the existing conversation to get the previous messages
         const conversation = await queries.getConversationById(conversationId, userId);
         if (!conversation) {
@@ -103,34 +100,25 @@ exports.startAIConversation = async (req, res) => {
         }
 
         let conversationHistory = conversation.messages.map((msg) => `${msg.sender}: ${msg.content}`).join('\n');
-        
-        // Include the original prompt in the conversation history
         conversationHistory += `\nUser: ${prompt}`;
 
-        // Step 1: Get response from ChatGPT
-        const chatGPTResponse = await getChatGPTResponse(conversationHistory);
-        console.log('ChatGPT Response:', chatGPTResponse); // Debugging
+        const newMessages = [{ sender: 'user', content: prompt }];
 
-        // Step 2: Append ChatGPT's response to conversation history and pass it to Gemini
-        conversationHistory += `\nChatGPT: ${chatGPTResponse}`;
-        const geminiResponse = await getGeminiResponse(conversationHistory);
-        console.log('Gemini Response:', geminiResponse); // Debugging
+        for (let turn = 0; turn < MAX_AI_TURNS; turn += 1) {
+            const chatGPTResponse = await getChatGPTResponse(conversationHistory);
+            newMessages.push({ sender: 'ChatGPT', content: chatGPTResponse });
+            conversationHistory += `\nChatGPT: ${chatGPTResponse}`;
 
-        // Step 3: Store all responses as messages in the conversation
-        const messages = [
-            { sender: 'user', content: prompt },
-            { sender: 'ChatGPT', content: chatGPTResponse },
-            { sender: 'Gemini', content: geminiResponse }
-        ];
+            const geminiResponse = await getGeminiResponse(conversationHistory);
+            newMessages.push({ sender: 'Gemini', content: geminiResponse });
+            conversationHistory += `\nGemini: ${geminiResponse}`;
+        }
 
-        // Create message entries in the database
-        const messageDocs = await Message.insertMany(messages);
+        const messageDocs = await Message.insertMany(newMessages);
         const messageIds = messageDocs.map((msg) => msg._id);
 
-        // Add messages to the conversation
         await queries.addMessagesToConversation(conversationId, messageIds, userId);
 
-        // Redirect to display the updated conversation
         res.redirect(`/conversation/${conversationId}`);
     } catch (error) {
         console.error('Error in AI conversation:', error);
