@@ -14,6 +14,23 @@ The idea behind this app was to create a tool that would facilitate a more inter
 - **Planning Materials:** [https://trello.com/b/u1LgmzUw/unit-2-project](#)
 - **ERD (Entity Relationship Diagram):** [https://www.figma.com/board/fz3IJeRhmb1F15ARa9XcoJ/ERD-%3E-Omni---AI?node-id=36-330&node-type=frame&t=fjAfmchKwpqTMhlT-0](#)
 
+### Run Locally
+
+```bash
+git clone https://github.com/Keya-Moradi/Omni-AI.git
+cd Omni-AI
+npm install
+cp .env.example .env  # if present; otherwise create .env matching keys below
+# fill in .env with:
+# MONGODB_URI=...
+# SESSION_SECRET=...
+# OPENAI_API_KEY=...
+# GOOGLE_API_KEY=...
+# GOOGLE_GEMINI_MODEL=gemini-flash-latest (or a model your key supports)
+npm run dev
+# visit http://localhost:3000
+```
+
 ## Features
 
 - User authentication (signup, login, logout) with session storage in MongoDB
@@ -76,3 +93,8 @@ const auth = new GoogleAuth({
 
 // Helper function to send a request to the ChatGPT API
 ```
+
+## Contributing / Collaboration
+
+- UX/UI is minimal today; we welcome contributions to improve design, layout, and overall experience.
+- Open issues/PRs for features, performance, or security. Please keep real secrets out of git—use `.env` locally and placeholders in `.env.example`.
