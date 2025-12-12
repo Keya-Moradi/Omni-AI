@@ -7,24 +7,49 @@
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-    <h1>AI Chatbox</h1>
-    <h2>Topic: <%= conversation.title %></h2>
+    <div class="page stack">
+        <div class="topbar">
+            <div class="stack">
+                <h1>AI Chat</h1>
+                <p class="muted"><%= conversation.title %></p>
+            </div>
+            <div class="top-actions">
+                <a class="badge" href="/dashboard">Back to dashboard</a>
+            </div>
+        </div>
 
-    <!-- Display conversation messages -->
-    <div id="messages">
-        <% conversation.messages.forEach(function(message) { %>
-            <p><strong><%= message.sender %>:</strong> <%= message.content %></p>
-        <% }); %>
+        <div class="card stack">
+            <div class="messages" id="messages">
+                <% conversation.messages.forEach(function(message) { %>
+                    <div class="message">
+                        <span class="sender"><%= message.sender %></span>
+                        <div><%= message.content %></div>
+                    </div>
+                <% }); %>
+            </div>
+
+            <form class="form-stack with-loader" action="/conversation/ai" method="POST">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <input type="hidden" name="conversationId" value="<%= conversation._id %>">
+                <textarea name="prompt" placeholder="Enter your prompt" required></textarea>
+                <button type="submit">Send to AI</button>
+            </form>
+            <div class="loading-indicator" aria-live="polite">
+                <span class="dot-pulse"></span> <span>AI is thinking...</span>
+            </div>
+        </div>
     </div>
 
-    <!-- Prompt input form -->
-    <form action="/conversation/ai" method="POST">
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-        <input type="hidden" name="conversationId" value="<%= conversation._id %>">
-        <input type="text" name="prompt" placeholder="Enter your prompt" required>
-        <button type="submit">Send to AI</button>
-    </form>
-
-    <a href="/dashboard">Back to Dashboard</a>
+    <script>
+        const forms = document.querySelectorAll('.with-loader');
+        forms.forEach((form) => {
+            form.addEventListener('submit', () => {
+                const indicator = form.parentElement.querySelector('.loading-indicator');
+                const btn = form.querySelector('button[type="submit"]');
+                if (btn) btn.disabled = true;
+                if (indicator) indicator.classList.add('show');
+            });
+        });
+    </script>
 </body>
 </html>

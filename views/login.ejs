@@ -7,28 +7,57 @@
 <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-    <h1>Login / Signup</h1>
-    <div class="login-container">
-        <img src="/images/Logo.jpeg" alt="Logo" class="login-image">
-        <div class="login-form">
-            <p><%= message %></p>
-            <form action="/signup" method="POST">
-                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                <input type="text" name="username" placeholder="Username" required>
-                <input type="password" name="password" placeholder="Password" required>
-                <input type="email" name="email" placeholder="Email" required>
-                <textarea name="profile_info" placeholder="Profile Info (optional)"></textarea>
-                <input type="text" name="preferences" placeholder="Preferences (optional JSON or text)">
-                <button type="submit">Sign Up</button>
-            </form>
-            <hr>
-            <form action="/login" method="POST">
-                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                <input type="text" name="username" placeholder="Username" required>
-                <input type="password" name="password" placeholder="Password" required>
-                <button type="submit">Login</button>
-            </form>
+    <div class="page">
+        <div class="topbar">
+            <h1>Omni-AI</h1>
+            <span class="badge">Sign up / Log in</span>
+        </div>
+
+        <div class="grid two">
+            <div class="card stack">
+                <div class="stack">
+                    <h2>Create account</h2>
+                    <p class="muted"><%= message %></p>
+                </div>
+                <form class="form-stack with-loader" action="/signup" method="POST">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <input type="text" name="username" placeholder="Username" required>
+                    <input type="email" name="email" placeholder="Email" required>
+                    <input type="password" name="password" placeholder="Password" required>
+                    <button type="submit">Sign Up</button>
+                </form>
+                <div class="loading-indicator" aria-live="polite">
+                    <span class="dot-pulse"></span> <span>Working...</span>
+                </div>
+            </div>
+
+            <div class="card stack">
+                <div class="stack">
+                    <h2>Welcome back</h2>
+                </div>
+                <form class="form-stack with-loader" action="/login" method="POST">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <input type="text" name="username" placeholder="Username" required>
+                    <input type="password" name="password" placeholder="Password" required>
+                    <button type="submit">Login</button>
+                </form>
+                <div class="loading-indicator" aria-live="polite">
+                    <span class="dot-pulse"></span> <span>Working...</span>
+                </div>
+            </div>
         </div>
     </div>
+
+    <script>
+        const forms = document.querySelectorAll('.with-loader');
+        forms.forEach((form) => {
+            form.addEventListener('submit', () => {
+                const indicator = form.parentElement.querySelector('.loading-indicator');
+                const btn = form.querySelector('button[type="submit"]');
+                if (btn) btn.disabled = true;
+                if (indicator) indicator.classList.add('show');
+            });
+        });
+    </script>
 </body>
 </html>
