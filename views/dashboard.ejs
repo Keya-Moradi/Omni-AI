@@ -110,7 +110,8 @@
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
                         },
-                        body: `_csrf=${encodeURIComponent(csrf)}`
+                        body: `_csrf=${encodeURIComponent(csrf)}`,
+                        credentials: 'same-origin'
                     });
                     if (res.ok) {
                         const item = document.querySelector(`[data-id="${pendingDeleteId}"]`)?.closest('.list-item');

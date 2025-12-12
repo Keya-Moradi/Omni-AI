@@ -101,6 +101,7 @@ User prompt: ${prompt}
 Previous assistant response (ChatGPT): ${chatGPTResponse}
 Respond to the user prompt, considering the assistant response above.
 `;
+        console.log('Gemini payload:', geminiPayload);
         const geminiResponse = await getGeminiResponse(geminiPayload);
         newMessages.push({ sender: 'Gemini', content: geminiResponse });
         conversationHistory += `\nGemini: ${geminiResponse}`;

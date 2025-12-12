@@ -7,6 +7,13 @@
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
+    <div class="overlay" id="global-loader">
+        <div class="modal">
+            <div class="loading-indicator show">
+                <span class="dot-pulse"></span> <span>Processing...</span>
+            </div>
+        </div>
+    </div>
     <div class="page stack">
         <div class="topbar">
             <div class="stack">
@@ -48,6 +55,8 @@
                 const btn = form.querySelector('button[type="submit"]');
                 if (btn) btn.disabled = true;
                 if (indicator) indicator.classList.add('show');
+                const overlay = document.getElementById('global-loader');
+                if (overlay) overlay.classList.add('show');
             });
         });
     </script>
