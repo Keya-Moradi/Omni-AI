@@ -32,3 +32,6 @@ Version numbers reflect notable pushes to `main`. Each entry summarizes what cha
 
 ## v1.7.0 – UI refresh
 - New cohesive styling, streamlined dashboard/chat, mobile-responsive layout, and loading indicators on forms/AI sends.
+
+## v1.7.1 – Code clarity pass
+- Added concise inline comments to server and AI controller to explain flow, personas, and boot order without cluttering logic.

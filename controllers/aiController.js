@@ -11,7 +11,7 @@ const MAX_AI_TURNS = parseInt(process.env.AI_TURNS_LIMIT || '1', 10);
 const CHATGPT_SYSTEM_PROMPT = 'You are ChatGPT. Respond concisely and label yourself as ChatGPT. Do not impersonate Gemini.';
 const GEMINI_SYSTEM_PROMPT = 'You are Gemini. Respond concisely and label yourself as Gemini. Do not impersonate ChatGPT.';
 
-// Helper function to send a request to the ChatGPT API
+// Call ChatGPT with a shared history and a persona reminder
 const getChatGPTResponse = async (conversationHistory) => {
     try {
         const response = await axios.post(
@@ -38,7 +38,7 @@ const getChatGPTResponse = async (conversationHistory) => {
     }
 };
 
-// Helper function to send a request to the Gemini API
+// Call Gemini with shared history and a persona reminder
 const getGeminiResponse = async (conversationHistory) => {
     try {
         const response = await axios.post(
@@ -74,7 +74,7 @@ const getGeminiResponse = async (conversationHistory) => {
     }
 };
 
-// Handle AI conversation flow
+// Handle AI conversation flow: validate, load convo, then loop ChatGPT/Gemini turns
 exports.startAIConversation = async (req, res) => {
     try {
         const userId = req.session.userId;
@@ -102,6 +102,7 @@ exports.startAIConversation = async (req, res) => {
         let conversationHistory = conversation.messages.map((msg) => `${msg.sender}: ${msg.content}`).join('\n');
         conversationHistory += `\nUser: ${prompt}`;
 
+        // Build the outbound message batch (user + alternating AI turns)
         const newMessages = [{ sender: 'user', content: prompt }];
 
         for (let turn = 0; turn < MAX_AI_TURNS; turn += 1) {

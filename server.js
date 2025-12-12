@@ -1,3 +1,4 @@
+// Bootstrap core libs and security middleware
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -11,6 +12,7 @@ const csrf = require('csurf');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Ensure required env vars exist before booting
 const requiredEnvs = ['MONGODB_URI', 'SESSION_SECRET'];
 const missingEnvs = requiredEnvs.filter((name) => !process.env[name]);
 if (missingEnvs.length) {
@@ -18,10 +20,12 @@ if (missingEnvs.length) {
     process.exit(1);
 }
 
+// Trust proxy when running behind HTTPS terminators
 if (process.env.NODE_ENV === 'production' || process.env.TRUST_PROXY === 'true') {
     app.set('trust proxy', 1);
 }
 
+// Rate limits for auth and AI endpoints
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 20,
@@ -38,7 +42,7 @@ const aiLimiter = rateLimit({
 
 const csrfProtection = csrf();
 
-// Middleware
+// Core middleware stack
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(methodOverride('_method'));
@@ -49,9 +53,11 @@ app.set('views', path.join(__dirname, 'views'));
 // Connect to MongoDB and start server
 const startServer = async () => {
     try {
+        // Connect to Mongo and only start the app once the DB is reachable
         await mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
         console.log('Connected to MongoDB baby!');
 
+        // Persist sessions in Mongo
         app.use(session({
             secret: process.env.SESSION_SECRET,
             resave: false,
@@ -67,6 +73,7 @@ const startServer = async () => {
             },
         }));
 
+        // CSRF protection for all state-changing requests
         app.use(csrfProtection);
         app.use((req, res, next) => {
             res.locals.csrfToken = req.csrfToken();
