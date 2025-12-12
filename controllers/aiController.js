@@ -87,15 +87,21 @@ const runAISequence = async (userId, conversationId, prompt) => {
 
     let conversationHistory = conversation.messages.map((msg) => `${msg.sender}: ${msg.content}`).join('\n');
     conversationHistory += `\nUser: ${prompt}`;
-
     const newMessages = [{ sender: 'user', content: prompt }];
 
     for (let turn = 0; turn < MAX_AI_TURNS; turn += 1) {
-        const chatGPTResponse = await getChatGPTResponse(conversationHistory);
+        // AI #1: ChatGPT responds to user + prior context
+        const chatGPTResponse = await getChatGPTResponse(`Conversation so far:\n${conversationHistory}\nUser prompt: ${prompt}`);
         newMessages.push({ sender: 'ChatGPT', content: chatGPTResponse });
         conversationHistory += `\nChatGPT: ${chatGPTResponse}`;
 
-        const geminiResponse = await getGeminiResponse(conversationHistory);
+        // AI #2: Gemini sees user prompt + ChatGPT response explicitly
+        const geminiPayload = `
+User prompt: ${prompt}
+Previous assistant response (ChatGPT): ${chatGPTResponse}
+Respond to the user prompt, considering the assistant response above.
+`;
+        const geminiResponse = await getGeminiResponse(geminiPayload);
         newMessages.push({ sender: 'Gemini', content: geminiResponse });
         conversationHistory += `\nGemini: ${geminiResponse}`;
     }

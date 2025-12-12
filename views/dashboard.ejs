@@ -6,7 +6,7 @@
     <title>Dashboard</title>
     <link rel="stylesheet" href="/css/styles.css">
 </head>
-<body>
+<body data-csrf="<%= csrfToken %>">
     <div class="page">
         <div class="topbar">
             <h1>Your Conversations</h1>
@@ -21,7 +21,7 @@
                 <form class="form-stack with-loader" action="/conversation/start" method="POST">
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                     <textarea name="prompt" placeholder="Ask anything to kick off a thread" required></textarea>
-                    <button type="submit">Start</button>
+                    <button type="submit">Submit</button>
                 </form>
                 <div class="loading-indicator" aria-live="polite">
                     <span class="dot-pulse"></span> <span>Saving...</span>
@@ -47,10 +47,7 @@
                                         <input type="text" name="newTitle" placeholder="Rename" required>
                                         <button type="submit">Update</button>
                                     </form>
-                                    <form class="inline with-loader" action="/conversation/delete/<%= conversation._id %>?_method=DELETE" method="POST">
-                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                        <button type="submit">Delete</button>
-                                    </form>
+                                    <button class="btn-secondary js-delete" data-id="<%= conversation._id %>">Delete</button>
                                 </div>
                             </li>
                         <% }); %>
@@ -68,6 +65,71 @@
                 const btn = form.querySelector('button[type="submit"]');
                 if (btn) btn.disabled = true;
                 if (indicator) indicator.classList.add('show');
+            });
+        });
+
+        const csrf = document.body.getAttribute('data-csrf');
+        const overlay = document.createElement('div');
+        overlay.className = 'overlay';
+        overlay.innerHTML = `<div class="modal"><div class="loading-indicator show"><span class="dot-pulse"></span><span>Starting conversation...</span></div></div>`;
+        document.body.appendChild(overlay);
+
+        const startForm = document.querySelector('form[action="/conversation/start"]');
+        if (startForm) {
+            startForm.addEventListener('submit', () => {
+                const btn = startForm.querySelector('button[type="submit"]');
+                if (btn) btn.disabled = true;
+                overlay.classList.add('show');
+            });
+        }
+
+        // Delete confirmation
+        const modal = document.createElement('div');
+        modal.className = 'overlay';
+        modal.innerHTML = `
+            <div class="modal">
+                <h3>Delete conversation?</h3>
+                <p class="muted">Do you really want to delete this conversation?</p>
+                <div class="modal-actions">
+                    <button class="btn-secondary" data-action="cancel">Cancel</button>
+                    <button data-action="confirm">Delete</button>
+                </div>
+            </div>`;
+        document.body.appendChild(modal);
+
+        let pendingDeleteId = null;
+        modal.addEventListener('click', async (e) => {
+            if (e.target.dataset.action === 'cancel' || e.target === modal) {
+                pendingDeleteId = null;
+                modal.classList.remove('show');
+            }
+            if (e.target.dataset.action === 'confirm' && pendingDeleteId) {
+                try {
+                    const res = await fetch(`/conversation/delete/${pendingDeleteId}?_method=DELETE`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: `_csrf=${encodeURIComponent(csrf)}`
+                    });
+                    if (res.ok) {
+                        const item = document.querySelector(`[data-id="${pendingDeleteId}"]`)?.closest('.list-item');
+                        if (item) item.remove();
+                    }
+                } catch (err) {
+                    console.error('Delete failed', err);
+                } finally {
+                    pendingDeleteId = null;
+                    modal.classList.remove('show');
+                }
+            }
+        });
+
+        document.querySelectorAll('.js-delete').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                pendingDeleteId = btn.getAttribute('data-id');
+                modal.classList.add('show');
             });
         });
     </script>

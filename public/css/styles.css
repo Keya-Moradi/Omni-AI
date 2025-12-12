@@ -203,6 +203,45 @@ button:disabled {
     display: inline-flex;
 }
 
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 16, 31, 0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.overlay.show {
+    display: flex;
+}
+
+.modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px;
+    max-width: 360px;
+    width: 90%;
+    text-align: center;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 16px;
+}
+
+.btn-secondary {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    box-shadow: none;
+}
+
 .dot-pulse {
     display: inline-block;
     width: 6px;
