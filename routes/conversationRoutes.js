@@ -6,7 +6,7 @@ const { body, param } = require('express-validator');
 // Conversation routes
 router.get('/dashboard', conversationController.viewConversations);
 router.post('/conversation/start',
-    body('title').trim().isLength({ min: 1, max: 200 }).withMessage('Title is required and must be under 200 characters.'),
+    body('prompt').trim().isLength({ min: 1, max: 2000 }).withMessage('Prompt is required and must be under 2000 characters.'),
     conversationController.startConversation
 );
 router.put('/conversation/edit',

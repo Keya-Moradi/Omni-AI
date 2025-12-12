@@ -41,3 +41,7 @@ Version numbers reflect notable pushes to `main`. Each entry summarizes what cha
 
 ## v1.7.3 – CSP protocol update
 - Replaced Codex Safe Protocol with expanded CSP/God/Hellfire instructions for working in this repo.
+
+## v1.7.4 – Conversation start + AI UX
+- Start-a-conversation now accepts a prompt, auto-titles the thread, opens the chat, and runs the initial AI turn.
+- Added reusable AI sequence helper and ensured chaining uses prior AI responses.

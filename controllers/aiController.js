@@ -74,6 +74,38 @@ const getGeminiResponse = async (conversationHistory) => {
     }
 };
 
+// Core AI sequence: appends user prompt + alternating ChatGPT/Gemini turns, returns new messages
+const runAISequence = async (userId, conversationId, prompt) => {
+    if (!OPENAI_API_KEY || !GOOGLE_API_KEY) {
+        throw new Error('AI services are not configured. Please set OPENAI_API_KEY and GOOGLE_API_KEY.');
+    }
+
+    const conversation = await queries.getConversationById(conversationId, userId);
+    if (!conversation) {
+        throw new Error('Conversation not found or unauthorized');
+    }
+
+    let conversationHistory = conversation.messages.map((msg) => `${msg.sender}: ${msg.content}`).join('\n');
+    conversationHistory += `\nUser: ${prompt}`;
+
+    const newMessages = [{ sender: 'user', content: prompt }];
+
+    for (let turn = 0; turn < MAX_AI_TURNS; turn += 1) {
+        const chatGPTResponse = await getChatGPTResponse(conversationHistory);
+        newMessages.push({ sender: 'ChatGPT', content: chatGPTResponse });
+        conversationHistory += `\nChatGPT: ${chatGPTResponse}`;
+
+        const geminiResponse = await getGeminiResponse(conversationHistory);
+        newMessages.push({ sender: 'Gemini', content: geminiResponse });
+        conversationHistory += `\nGemini: ${geminiResponse}`;
+    }
+
+    const messageDocs = await Message.insertMany(newMessages);
+    const messageIds = messageDocs.map((msg) => msg._id);
+    await queries.addMessagesToConversation(conversationId, messageIds, userId);
+    return newMessages;
+};
+
 // Handle AI conversation flow: validate, load convo, then loop ChatGPT/Gemini turns
 exports.startAIConversation = async (req, res) => {
     try {
@@ -89,40 +121,14 @@ exports.startAIConversation = async (req, res) => {
             return res.status(400).send(errors.array()[0].msg);
         }
 
-        if (!OPENAI_API_KEY || !GOOGLE_API_KEY) {
-            return res.status(500).send('AI services are not configured. Please set OPENAI_API_KEY and GOOGLE_API_KEY.');
-        }
-
-        // Fetch the existing conversation to get the previous messages
-        const conversation = await queries.getConversationById(conversationId, userId);
-        if (!conversation) {
-            return res.status(404).send('Conversation not found or unauthorized');
-        }
-
-        let conversationHistory = conversation.messages.map((msg) => `${msg.sender}: ${msg.content}`).join('\n');
-        conversationHistory += `\nUser: ${prompt}`;
-
-        // Build the outbound message batch (user + alternating AI turns)
-        const newMessages = [{ sender: 'user', content: prompt }];
-
-        for (let turn = 0; turn < MAX_AI_TURNS; turn += 1) {
-            const chatGPTResponse = await getChatGPTResponse(conversationHistory);
-            newMessages.push({ sender: 'ChatGPT', content: chatGPTResponse });
-            conversationHistory += `\nChatGPT: ${chatGPTResponse}`;
-
-            const geminiResponse = await getGeminiResponse(conversationHistory);
-            newMessages.push({ sender: 'Gemini', content: geminiResponse });
-            conversationHistory += `\nGemini: ${geminiResponse}`;
-        }
-
-        const messageDocs = await Message.insertMany(newMessages);
-        const messageIds = messageDocs.map((msg) => msg._id);
-
-        await queries.addMessagesToConversation(conversationId, messageIds, userId);
+        await runAISequence(userId, conversationId, prompt);
 
         res.redirect(`/conversation/${conversationId}`);
     } catch (error) {
         console.error('Error in AI conversation:', error);
-        res.status(500).send('An error occurred while processing the AI conversation. Please try again.');
+        const message = error.message || 'An error occurred while processing the AI conversation. Please try again.';
+        res.status(500).send(message);
     }
 };
+
+exports.runAISequence = runAISequence;

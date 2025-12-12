@@ -2,6 +2,7 @@ const queries = require('../queries');
 const User = require('../models/User');
 const Message = require('../models/Message');
 const { validationResult } = require('express-validator');
+const { runAISequence } = require('./aiController');
 
 // Render the dashboard with the user's conversations
 exports.viewConversations = async (req, res) => {
@@ -26,7 +27,7 @@ exports.viewConversations = async (req, res) => {
     }
 };
 
-// Start a new conversation
+// Start a new conversation from an initial prompt (auto-title, kick off AI, redirect to chat)
 exports.startConversation = async (req, res) => {
     try {
         const userId = req.session.userId;
@@ -39,7 +40,8 @@ exports.startConversation = async (req, res) => {
             return res.status(400).send(errors.array()[0].msg);
         }
 
-        const { title } = req.body;
+        const { prompt } = req.body;
+        const title = prompt.length > 60 ? `${prompt.slice(0, 60).trim()}…` : prompt;
 
         // Create a new conversation using queries.js
         const newConversation = await queries.createConversation(userId, title);
@@ -47,7 +49,10 @@ exports.startConversation = async (req, res) => {
         // Add conversation to user's conversations
         await User.findByIdAndUpdate(userId, { $push: { conversations: newConversation._id } });
 
-        res.redirect('/dashboard');
+        // Kick off initial AI sequence with the first prompt
+        await runAISequence(userId, newConversation._id, prompt);
+
+        res.redirect(`/conversation/${newConversation._id}`);
     } catch (error) {
         console.error('Error starting conversation:', error);
         res.status(500).send('An error occurred while starting the conversation. Please try again.');
