@@ -57,6 +57,9 @@
                 if (indicator) indicator.classList.add('show');
                 const overlay = document.getElementById('global-loader');
                 if (overlay) overlay.classList.add('show');
+                setTimeout(() => {
+                    if (overlay) overlay.classList.remove('show');
+                }, 15000); // failsafe hide after 15s in case of navigation delay
             });
         });
     </script>

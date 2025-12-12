@@ -46,7 +46,7 @@ Version numbers reflect notable pushes to `main`. Each entry summarizes what cha
 - Start-a-conversation now accepts a prompt, auto-titles the thread, opens the chat, and runs the initial AI turn.
 - Added reusable AI sequence helper and ensured chaining uses prior AI responses.
 
-## v1.7.5 – Delete UX, AI chaining tweaks, and submit loader
-- Dashboard delete now uses a confirm modal and removes threads inline without blank pages.
-- New conversation button reads “Submit” and shows a blocking overlay while the thread starts.
-- AI chaining makes Gemini explicitly see ChatGPT’s response plus the user prompt.
+## v1.7.5 – Delete UX, loader, and AI chaining fixes
+- Confirm-modal delete calls the API with credentials, removes threads inline, and uses overlay loader to avoid blank pages.
+- Start/Send/Delete/Update now surface overlay loaders and disable buttons while in flight.
+- Gemini reacts to ChatGPT output (ChatGPT prompt feeds Gemini prompt), and Gemini name prefixes are stripped.

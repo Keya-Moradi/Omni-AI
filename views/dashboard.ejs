@@ -65,13 +65,15 @@
                 const btn = form.querySelector('button[type="submit"]');
                 if (btn) btn.disabled = true;
                 if (indicator) indicator.classList.add('show');
+                overlay.classList.add('show');
+                setTimeout(() => overlay.classList.remove('show'), 15000);
             });
         });
 
         const csrf = document.body.getAttribute('data-csrf');
         const overlay = document.createElement('div');
         overlay.className = 'overlay';
-        overlay.innerHTML = `<div class="modal"><div class="loading-indicator show"><span class="dot-pulse"></span><span>Starting conversation...</span></div></div>`;
+        overlay.innerHTML = `<div class="modal"><div class="loading-indicator show"><span class="dot-pulse"></span><span>Processing...</span></div></div>`;
         document.body.appendChild(overlay);
 
         const startForm = document.querySelector('form[action="/conversation/start"]');
@@ -80,6 +82,7 @@
                 const btn = startForm.querySelector('button[type="submit"]');
                 if (btn) btn.disabled = true;
                 overlay.classList.add('show');
+                setTimeout(() => overlay.classList.remove('show'), 15000);
             });
         }
 
@@ -105,6 +108,7 @@
             }
             if (e.target.dataset.action === 'confirm' && pendingDeleteId) {
                 try {
+                    overlay.classList.add('show');
                     const res = await fetch(`/conversation/delete/${pendingDeleteId}?_method=DELETE`, {
                         method: 'POST',
                         headers: {
@@ -122,6 +126,7 @@
                 } finally {
                     pendingDeleteId = null;
                     modal.classList.remove('show');
+                    overlay.classList.remove('show');
                 }
             }
         });

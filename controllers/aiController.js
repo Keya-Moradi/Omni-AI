@@ -8,8 +8,8 @@ const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 const GEMINI_MODEL = process.env.GOOGLE_GEMINI_MODEL || 'gemini-1.5-flash-latest';
 const GEMINI_API_BASE = process.env.GOOGLE_GEMINI_API_BASE || 'https://generativelanguage.googleapis.com';
 const MAX_AI_TURNS = parseInt(process.env.AI_TURNS_LIMIT || '1', 10);
-const CHATGPT_SYSTEM_PROMPT = 'You are ChatGPT. Respond concisely and label yourself as ChatGPT. Do not impersonate Gemini.';
-const GEMINI_SYSTEM_PROMPT = 'You are Gemini. Respond concisely and label yourself as Gemini. Do not impersonate ChatGPT.';
+const CHATGPT_SYSTEM_PROMPT = 'You are ChatGPT. Respond concisely as ChatGPT and do not prefix with your name.';
+const GEMINI_SYSTEM_PROMPT = 'You are Gemini. Respond concisely and do not prefix with your name. React to the prior assistant message when provided.';
 
 // Call ChatGPT with a shared history and a persona reminder
 const getChatGPTResponse = async (conversationHistory) => {
@@ -74,6 +74,8 @@ const getGeminiResponse = async (conversationHistory) => {
     }
 };
 
+const stripPrefix = (text) => text.replace(/^\s*gemini\s*:\s*/i, '').trim();
+
 // Core AI sequence: appends user prompt + alternating ChatGPT/Gemini turns, returns new messages
 const runAISequence = async (userId, conversationId, prompt) => {
     if (!OPENAI_API_KEY || !GOOGLE_API_KEY) {
@@ -90,19 +92,16 @@ const runAISequence = async (userId, conversationId, prompt) => {
     const newMessages = [{ sender: 'user', content: prompt }];
 
     for (let turn = 0; turn < MAX_AI_TURNS; turn += 1) {
-        // AI #1: ChatGPT responds to user + prior context
-        const chatGPTResponse = await getChatGPTResponse(`Conversation so far:\n${conversationHistory}\nUser prompt: ${prompt}`);
+        // AI #1: ChatGPT responds to the user prompt
+        const chatGPTResponse = await getChatGPTResponse(`User prompt: ${prompt}`);
         newMessages.push({ sender: 'ChatGPT', content: chatGPTResponse });
         conversationHistory += `\nChatGPT: ${chatGPTResponse}`;
 
-        // AI #2: Gemini sees user prompt + ChatGPT response explicitly
-        const geminiPayload = `
-User prompt: ${prompt}
-Previous assistant response (ChatGPT): ${chatGPTResponse}
-Respond to the user prompt, considering the assistant response above.
-`;
+        // AI #2: Gemini reacts to ChatGPT response (using ChatGPT text as the prompt)
+        const geminiPayload = `Previous assistant response (ChatGPT): ${chatGPTResponse}\nRespond concisely without prefixing your name.`;
         console.log('Gemini payload:', geminiPayload);
-        const geminiResponse = await getGeminiResponse(geminiPayload);
+        const geminiResponseRaw = await getGeminiResponse(geminiPayload);
+        const geminiResponse = stripPrefix(geminiResponseRaw);
         newMessages.push({ sender: 'Gemini', content: geminiResponse });
         conversationHistory += `\nGemini: ${geminiResponse}`;
     }
