@@ -35,3 +35,9 @@ Version numbers reflect notable pushes to `main`. Each entry summarizes what cha
 
 ## v1.7.1 – Code clarity pass
 - Added concise inline comments to server and AI controller to explain flow, personas, and boot order without cluttering logic.
+
+## v1.7.2 – Release process checklist
+- Added `docs/RELEASE_CHECKLIST.md` to enforce comment sanity, CSP adherence, and version history updates before pushes to main.
+
+## v1.7.3 – CSP protocol update
+- Replaced Codex Safe Protocol with expanded CSP/God/Hellfire instructions for working in this repo.
