@@ -1,0 +1,135 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import projects from '../data/projects';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
+  .slice(0, 2);
+---
+
+<BaseLayout
+  title="Omni — Minimal Personal OS"
+  description="A clean personal site with ongoing projects, writing, and ways to get in touch."
+>
+  <section class="surface p-8">
+    <p class="eyebrow">Personal OS</p>
+    <h1 class="mt-3 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+      Building quietly, documenting openly.
+    </h1>
+    <p class="mt-4 max-w-2xl text-slate-600">
+      A minimal hub for what I am working on right now — notes, experiments, and the projects that
+      keep me curious.
+    </p>
+    <div class="mt-6 flex flex-wrap gap-3 text-sm text-slate-600">
+      <a class="rounded-md border border-slate-200 px-3 py-2 hover:text-slate-900" href="/about">
+        About me
+      </a>
+      <a class="rounded-md border border-slate-200 px-3 py-2 hover:text-slate-900" href="/projects">
+        Ongoing projects
+      </a>
+      <a class="rounded-md border border-slate-200 px-3 py-2 hover:text-slate-900" href="/contact">
+        Contact
+      </a>
+    </div>
+  </section>
+
+  <section class="mt-10 grid gap-6 md:grid-cols-2">
+    <div class="surface p-6">
+      <p class="eyebrow">Focus</p>
+      <h2 class="mt-3 text-xl font-semibold text-slate-900">What I am iterating on</h2>
+      <ul class="mt-4 space-y-3 text-sm text-slate-700">
+        <li class="flex items-start gap-2">
+          <span class="mt-1 h-2 w-2 rounded-full bg-emerald-500"></span>
+          Systems thinking, calm productivity, and lightweight personal tooling.
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="mt-1 h-2 w-2 rounded-full bg-blue-500"></span>
+          Writing short notes that clarify ideas before turning into long-form posts.
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="mt-1 h-2 w-2 rounded-full bg-amber-500"></span>
+          Building tiny, durable web products with modern static stacks.
+        </li>
+      </ul>
+    </div>
+    <div class="surface p-6">
+      <p class="eyebrow">Now</p>
+      <h2 class="mt-3 text-xl font-semibold text-slate-900">Currently in motion</h2>
+      <ul class="mt-4 space-y-3 text-sm text-slate-700">
+        <li class="flex justify-between rounded-lg border border-slate-200 px-3 py-2">
+          <span>Shipping weekly blog updates</span>
+          <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">Routine</span>
+        </li>
+        <li class="flex justify-between rounded-lg border border-slate-200 px-3 py-2">
+          <span>Designing a minimal status dashboard</span>
+          <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">In progress</span>
+        </li>
+        <li class="flex justify-between rounded-lg border border-slate-200 px-3 py-2">
+          <span>Keeping an open inbox for collaborations</span>
+          <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">Open</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="mt-10">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="eyebrow">Projects</p>
+        <h2 class="mt-2 text-xl font-semibold text-slate-900">Ongoing projects</h2>
+      </div>
+      <a class="text-sm font-medium text-slate-700 hover:text-slate-900" href="/projects">View all</a>
+    </div>
+    <div class="mt-4 space-y-4">
+      {projects.slice(0, 2).map((project) => (
+        <article class="surface p-5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h3 class="text-lg font-semibold text-slate-900">{project.title}</h3>
+            <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-600">
+              {project.status}
+            </span>
+          </div>
+          <p class="mt-2 text-sm text-slate-600">{project.summary}</p>
+          <div class="mt-3 flex flex-wrap gap-2 text-xs text-slate-600">
+            {project.stack.map((tech) => (
+              <span class="rounded-md border border-slate-200 px-2 py-1">{tech}</span>
+            ))}
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="mt-10">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="eyebrow">Latest</p>
+        <h2 class="mt-2 text-xl font-semibold text-slate-900">Recent writing</h2>
+      </div>
+      <a class="text-sm font-medium text-slate-700 hover:text-slate-900" href="/blog">Open blog</a>
+    </div>
+    <div class="mt-4 space-y-4">
+      {posts.map((post) => (
+        <article class="surface p-5">
+          <div class="flex items-center justify-between gap-2">
+            <h3 class="text-lg font-semibold text-slate-900">
+              <a href={`/blog/${post.slug}`}>{post.data.title}</a>
+            </h3>
+            <time class="text-xs text-slate-500" datetime={post.data.pubDate.toISOString()}>
+              {new Intl.DateTimeFormat('en', { dateStyle: 'medium' }).format(post.data.pubDate)}
+            </time>
+          </div>
+          <p class="mt-2 text-sm text-slate-600">{post.data.description}</p>
+          {post.data.tags && (
+            <div class="mt-3 flex flex-wrap gap-2 text-xs text-slate-600">
+              {post.data.tags.map((tag) => (
+                <span class="rounded-md border border-slate-200 px-2 py-1">{tag}</span>
+              ))}
+            </div>
+          )}
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

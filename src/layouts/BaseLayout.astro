@@ -1,0 +1,43 @@
+---
+import Footer from '../components/Footer.astro';
+import Nav from '../components/Nav.astro';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Omni — Personal OS',
+  description = 'A minimal personal site built with Astro, Tailwind CSS, and MDX.',
+} = Astro.props as Props;
+
+const site = Astro.site ?? new URL('https://example.com');
+const canonical = new URL(Astro.url.pathname, site).toString();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+  </head>
+  <body class="min-h-screen">
+    <Nav />
+    <main class="mx-auto max-w-3xl px-6">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
