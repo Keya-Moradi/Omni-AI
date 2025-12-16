@@ -1,80 +1,100 @@
-# Minimal Personal Site (Astro + Tailwind + MDX)
+# Omni-AI: AI Integration Platform
 
-A clean, OS-inspired personal site with an about page, projects, blog (MDX), and contact page. Built with Astro for fast static output and Tailwind for the minimal styling.
+![Omni-AI Login Screen](.vscode/images/Omni-AI.jpeg)
 
-## Stack
-- Astro (SSG) + TypeScript
-- Tailwind CSS with typography plugin
-- MDX via Astro Content Collections
-- SEO basics: OpenGraph meta, sitemap integration, robots.txt
+## Description
+
+Omni-AI is an AI integration platform that allows users to interact with multiple AI systems, such as OpenAI's ChatGPT and Google's Gemini. This platform provides an innovative way to see how different AI entities collaborate to respond to prompts. It also offers a dynamic interaction model where users can guide the AI's conversation and observe how different AI systems generate responses.
+
+The idea behind this app was to create a tool that would facilitate a more interactive and nuanced conversation with AI by bringing in the perspectives of multiple AI systems, providing a richer and more diverse user experience.
 
 ## Getting Started
-1. Install dependencies (Node 18+ recommended):
-   ```bash
-   npm install
-   ```
-2. Run locally:
-   ```bash
-   npm run dev
-   ```
-3. Production build & preview:
-   ```bash
-   npm run build
-   npm run preview
-   ```
-4. Type/check:
-   ```bash
-   npm run check
-   ```
 
-## Project Structure
-```
-/
-├─ src/
-│  ├─ components/
-│  │  ├─ Nav.astro
-│  │  └─ Footer.astro
-│  ├─ layouts/
-│  │  └─ BaseLayout.astro
-│  ├─ pages/
-│  │  ├─ index.astro
-│  │  ├─ about.astro
-│  │  ├─ projects.astro
-│  │  ├─ contact.astro
-│  │  ├─ blog/
-│  │  │  ├─ index.astro
-│  │  │  └─ [slug].astro
-│  ├─ content/
-│  │  ├─ config.ts
-│  │  └─ blog/
-│  │     ├─ hello-world.mdx
-│  │     └─ second-post.mdx
-│  ├─ data/
-│  │  └─ projects.ts
-│  └─ styles/
-│     └─ global.css
-├─ public/
-│  └─ robots.txt
-├─ astro.config.mjs
-├─ tailwind.config.mjs
-├─ tsconfig.json
-└─ README.md
+- **Deployed App:** [https://omni-ai-app-fc082d83eddb.herokuapp.com/](#)
+- **Planning Materials:** [https://trello.com/b/u1LgmzUw/unit-2-project](#)
+- **ERD (Entity Relationship Diagram):** [https://www.figma.com/board/fz3IJeRhmb1F15ARa9XcoJ/ERD-%3E-Omni---AI?node-id=36-330&node-type=frame&t=fjAfmchKwpqTMhlT-0](#)
+
+### Run Locally
+
+```bash
+git clone https://github.com/Keya-Moradi/Omni-AI.git
+cd Omni-AI
+npm install
+cp .env.example .env  # if present; otherwise create .env matching keys below
+# fill in .env with:
+# MONGODB_URI=...
+# SESSION_SECRET=...
+# OPENAI_API_KEY=...
+# GOOGLE_API_KEY=...
+# GOOGLE_GEMINI_MODEL=gemini-flash-latest (or a model your key supports)
+npm run dev
+# visit http://localhost:3000
 ```
 
-## Content & Customization
-- **Blog posts**: add MDX files in `src/content/blog`. Required frontmatter:
-  ```yaml
-  title: string
-  description: string
-  pubDate: YYYY-MM-DD
-  tags: [optional string array]
-  draft: true # optional; drafts are excluded from the index
-  ```
-- **Projects**: edit `src/data/projects.ts` to update title, status, summary, stack, and optional links.
-- **SEO/site metadata**: update `site` in `astro.config.mjs`, adjust defaults in `src/layouts/BaseLayout.astro`, and mirror the sitemap URL in `public/robots.txt`.
-- **Contact links**: update the email/social targets in `src/pages/contact.astro` and `src/components/Footer.astro`.
-- **Styling**: Tailwind utilities live in templates; base styles and helpers are in `src/styles/global.css`.
+## Features
 
-## Deployment
-- `npm run build` outputs a static `dist/` folder. Deploy to any static host (Vercel, Netlify, Cloudflare Pages, S3, etc.).
-- Set the correct `site` URL in `astro.config.mjs` before deploying so the sitemap and canonical tags are accurate.
+- User authentication (signup, login, logout) with session storage in MongoDB
+- Create, edit, view, and delete conversations tied to the logged-in user
+- Multi-AI back-and-forth: ChatGPT and Gemini alternate responses using shared conversation context (default 1 turn each per prompt; configurable)
+- Form CSRF protection, input validation, and rate limiting on auth/AI routes
+- Static EJS views for login, dashboard, and chatbox
+
+## Screenshot
+
+![User Experience](.vscode/images/UX.jpeg)
+
+## Attributions
+
+- **[OpenAI](https://openai.com/)** - Used for the ChatGPT API integration.
+- **[Google Cloud](https://cloud.google.com/)** - Used for the Gemini AI API integration.
+- **[Google Auth Library](https://www.npmjs.com/package/google-auth-library)** - For Google Cloud service account authentication.
+- **[Axios](https://www.npmjs.com/package/axios)** - For making API requests.
+- **[bcryptjs](https://www.npmjs.com/package/bcryptjs)** - For password hashing in user authentication.
+- **[EJS](https://ejs.co/)** - For rendering views.
+- **[Express.js](https://expressjs.com/)** - As the web application framework.
+- **[Mongoose](https://mongoosejs.com/)** - For MongoDB object modeling.
+- **[dotenv](https://www.npmjs.com/package/dotenv)** - For environment variable management.
+- **[Nodemon](https://www.npmjs.com/package/nodemon)** - For development server.
+
+## Technologies Used
+
+- **JavaScript**
+- **Node.js**
+- **Express.js**
+- **MongoDB (Mongoose)**
+- **EJS (Embedded JavaScript Templates)**
+- **Axios**
+- **OpenAI API (ChatGPT)**
+- **Google Generative Language API (Gemini)**
+- **HTML/CSS**
+- **Security middleware:** Helmet, express-session with MongoStore, express-rate-limit, csurf, express-validator
+
+## Next Steps (Stretch Goals)
+
+- **Improved UI/UX:** Enhance the user interface for a more user-friendly experience.
+- **AI Conversation Logs:** Display detailed conversation logs for each AI interaction.
+- **AI Model Customization:** Allow users to choose specific AI models (e.g., GPT-4) and customize the interaction settings.
+- **Multi-Language Support:** Enable AI interactions in multiple languages.
+- **AI Summary:** Provide a feature where AI generates a summary of each conversation.
+- **Real-time Collaboration:** Allow multiple users to observe and guide the AI interactions in real-time.
+
+## Next Steps for API Requests in `aiController.js`
+
+For the `aiController.js` API requests, below is the code for the next steps:
+
+```javascript
+// Download the JSON key file, which contains the credentials needed for API access.
+
+// Google Auth setup for Gemini API
+const auth = new GoogleAuth({
+    keyFile: GOOGLE_SERVICE_ACCOUNT_PATH,
+    scopes: ['https://www.googleapis.com/auth/cloud-platform'],
+});
+
+// Helper function to send a request to the ChatGPT API
+```
+
+## Contributing / Collaboration
+
+- UX/UI is minimal today; we welcome contributions to improve design, layout, and overall experience.
+- Open issues/PRs for features, performance, or security. Please keep real secrets out of git—use `.env` locally and placeholders in `.env.example`.
